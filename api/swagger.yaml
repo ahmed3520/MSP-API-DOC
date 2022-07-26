@@ -1,0 +1,517 @@
+---
+swagger: "2.0"
+info:
+  description: "MSP server.  You can find \nout more about Swagger at \n[http://swagger.io](http://swagger.io)\
+    \ or on \n[irc.freenode.net, #swagger](http://swagger.io/irc/).\n"
+  version: "1.0.0"
+  title: "MSP Server"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "msp-test.onrender.com"
+basePath: "/API/v1"
+tags:
+- name: "event"
+  description: "Everything about MSP Event"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+- name: "community"
+  description: "Access to MSP communities"
+- name: "user"
+  description: "Operations about user"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
+paths:
+  /event:
+    get:
+      tags:
+      - "event"
+      summary: "Get list of all events"
+      operationId: "getEvents"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successful operatoin"
+          schema:
+            $ref: "#/definitions/Event"
+      x-swagger-router-controller: "Event"
+    post:
+      tags:
+      - "event"
+      summary: "Add a new event to the DB"
+      operationId: "addEvent"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Event object that needs to be added to the DB"
+        required: true
+        schema:
+          $ref: "#/definitions/Event"
+      responses:
+        "405":
+          description: "Invalid input"
+      x-swagger-router-controller: "Event"
+  /event/{eventId}:
+    get:
+      tags:
+      - "event"
+      summary: "Find event by ID"
+      description: "Returns a single event"
+      operationId: "getEventById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "eventId"
+        in: "path"
+        description: "ID of pet to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      security:
+      - api_key: []
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Event"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Event not found"
+      x-swagger-router-controller: "Event"
+    put:
+      tags:
+      - "event"
+      summary: "Update an existing event"
+      operationId: "updateEvent"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "eventId"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated event object"
+        required: true
+        schema:
+          $ref: "#/definitions/Event"
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Event not found"
+        "405":
+          description: "Validation exception"
+      x-swagger-router-controller: "Event"
+    delete:
+      tags:
+      - "event"
+      summary: "Deletes a event"
+      operationId: "deleteEvent"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "eventId"
+        in: "path"
+        description: "event id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Pet not found"
+      x-swagger-router-controller: "Event"
+  /user:
+    post:
+      tags:
+      - "user"
+      summary: "Create user"
+      description: "This can only be done by the logged in user."
+      operationId: "createUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "User"
+  /user/login:
+    get:
+      tags:
+      - "user"
+      summary: "Logs user into the system"
+      operationId: "loginUser"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "username"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          headers:
+            X-Rate-Limit:
+              type: "integer"
+              format: "int32"
+              description: "calls per hour allowed by the user"
+            X-Expires-After:
+              type: "string"
+              format: "date-time"
+              description: "date in UTC when token expires"
+          schema:
+            type: "string"
+        "400":
+          description: "Invalid username/password supplied"
+      x-swagger-router-controller: "User"
+  /user/logout:
+    get:
+      tags:
+      - "user"
+      summary: "Logs out current logged in user session"
+      operationId: "logoutUser"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "User"
+  /user/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "Get user by user name"
+      operationId: "getUserByName"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing."
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "Invalid username supplied"
+        "404":
+          description: "User not found"
+      x-swagger-router-controller: "User"
+    put:
+      tags:
+      - "user"
+      summary: "Updated user"
+      description: "This can only be done by the logged in user."
+      operationId: "updateUser"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        "400":
+          description: "Invalid user supplied"
+        "404":
+          description: "User not found"
+      x-swagger-router-controller: "User"
+    delete:
+      tags:
+      - "user"
+      summary: "Delete user"
+      description: "This can only be done by the logged in user."
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be deleted"
+        required: true
+        type: "string"
+      responses:
+        "400":
+          description: "Invalid username supplied"
+        "404":
+          description: "User not found"
+      x-swagger-router-controller: "User"
+securityDefinitions:
+  petstore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:pets: "modify pets in your account"
+      read:pets: "read your pets"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Order:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      petId:
+        type: "integer"
+        format: "int64"
+      quantity:
+        type: "integer"
+        format: "int32"
+      shipDate:
+        type: "string"
+        format: "date-time"
+      status:
+        type: "string"
+        description: "Order Status"
+        enum:
+        - "placed"
+        - "approved"
+        - "delivered"
+      complete:
+        type: "boolean"
+        default: false
+    xml:
+      name: "Order"
+  Category:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+    xml:
+      name: "Category"
+  User:
+    type: "object"
+    properties:
+      user_id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      email:
+        type: "string"
+      phone:
+        type: "string"
+      can_dm:
+        type: "boolean"
+      is_admin:
+        type: "boolean"
+      profile_image_url:
+        type: "string"
+      cover_url:
+        type: "string"
+      verified:
+        type: "boolean"
+      member_of:
+        type: "array"
+        xml:
+          name: "community_id"
+          wrapped: true
+        items:
+          type: "string"
+      followers:
+        type: "integer"
+        format: "int32"
+      friends_count:
+        type: "integer"
+        format: "int32"
+      gender:
+        type: "string"
+    xml:
+      name: "User"
+    example:
+      friends_count: 1
+      can_dm: true
+      cover_url: "cover_url"
+      gender: "gender"
+      verified: true
+      profile_image_url: "profile_image_url"
+      is_admin: true
+      followers: 6
+      user_id: 0
+      phone: "phone"
+      name: "name"
+      member_of:
+      - "member_of"
+      - "member_of"
+      email: "email"
+  Event:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      type:
+        type: "string"
+      duration:
+        type: "integer"
+      start_date:
+        type: "string"
+      end_date:
+        type: "string"
+      event_status:
+        type: "string"
+      is_accessible_for_free:
+        type: "boolean"
+      in_language:
+        type: "string"
+      event_location:
+        type: "string"
+      maximum_physical_attendee_capacity:
+        type: "integer"
+        format: "int32"
+      maximum_virtual_attendee_capacity:
+        type: "integer"
+        format: "int32"
+      performer:
+        type: "array"
+        xml:
+          name: "members_id"
+          wrapped: true
+        items:
+          type: "string"
+      image_url:
+        type: "string"
+      event_creator_id:
+        type: "number"
+    xml:
+      name: "Event"
+    example:
+      end_date: "end_date"
+      in_language: "in_language"
+      event_creator_id: 5.63737665663332876420099637471139430999755859375
+      performer:
+      - "performer"
+      - "performer"
+      event_location: "event_location"
+      image_url: "image_url"
+      description: "description"
+      is_accessible_for_free: true
+      type: "type"
+      maximum_virtual_attendee_capacity: 5
+      duration: 6
+      name: "name"
+      id: 0
+      maximum_physical_attendee_capacity: 1
+      start_date: "start_date"
+      event_status: "event_status"
+  Tag:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+    xml:
+      name: "Tag"
+  Pet:
+    type: "object"
+    required:
+    - "name"
+    - "photoUrls"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      category:
+        $ref: "#/definitions/Category"
+      name:
+        type: "string"
+        example: "doggie"
+      photoUrls:
+        type: "array"
+        xml:
+          name: "photoUrl"
+          wrapped: true
+        items:
+          type: "string"
+      tags:
+        type: "array"
+        xml:
+          name: "tag"
+          wrapped: true
+        items:
+          $ref: "#/definitions/Tag"
+      status:
+        type: "string"
+        description: "pet status in the store"
+        enum:
+        - "available"
+        - "pending"
+        - "sold"
+    xml:
+      name: "Pet"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
